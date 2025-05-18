@@ -1,0 +1,9 @@
+[package]
+name = "plotter-rs"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+eframe = "0.31.1"
+egui = "0.31.1"
+math-parser = { git = "https://github.com/mteit/math-parser", tag="0.2.1" }
