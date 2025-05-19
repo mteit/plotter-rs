@@ -1,0 +1,90 @@
+name: Release
+
+on:
+  push:
+    tags: ["v[0-9]+.[0-9]+.[0-9]+*"]
+
+permissions:
+  contents: write
+
+env:
+  CARGO_TERM_COLOR: always
+  BINARY_NAME: plotter-rs
+
+jobs:
+  build:
+    name: Build
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-latest
+            target: x86_64-unknown-linux-gnu
+            artifact_name: plotter-rs-linux-amd64
+            asset_name: plotter-rs-linux-amd64
+          - os: macos-latest
+            target: aarch64-apple-darwin
+            artifact_name: plotter-rs-macos-arm64
+            asset_name: plotter-rs-macos-arm64
+          - os: windows-latest
+            target: x86_64-pc-windows-msvc
+            artifact_name: plotter-rs-windows-amd64.exe
+            asset_name: plotter-rs-windows-amd64.exe
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.target }}
+
+      - name: Build for target
+        run: cargo build --release --target ${{ matrix.target }} --verbose
+
+      - name: Create Release Directory
+        run: mkdir -p release
+
+      - name: Copy and prepare binary
+        shell: bash
+        run: |
+          cp target/${{ matrix.target }}/release/${{ env.BINARY_NAME }}${{ matrix.os == 'windows-latest' && '.exe' || '' }} release/${{ matrix.asset_name }}
+          chmod +x release/${{ matrix.asset_name }} || true
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.artifact_name }}
+          path: release/${{ matrix.asset_name }}
+
+  release:
+    name: Create Release
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+
+      - name: Make binaries executable (Linux/macOS)
+        run: |
+          chmod +x artifacts/plotter-rs-linux-amd64 || true
+          chmod +x artifacts/plotter-rs-macos-arm64 || true
+
+      - name: Zip each binary
+        run: |
+          cd artifacts
+          zip -r plotter-rs-linux-amd64.zip plotter-rs-linux-amd64
+          zip -r plotter-rs-macos-arm64.zip plotter-rs-macos-arm64
+          zip -r plotter-rs-windows-amd64.zip plotter-rs-windows-amd64.exe
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: artifacts/*.zip
+          draft: false
+          prerelease: false
+          generate_release_notes: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
