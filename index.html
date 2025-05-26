@@ -1,0 +1,31 @@
+<!doctype html>
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>PLOTTER</title>
+    <style>
+      canvas {
+        display: block;
+        margin: auto;
+        background-color: #f0f0f0;
+      }
+    </style>
+  </head>
+  <body>
+    <canvas
+      id="the_canvas_id"
+      tabindex="0"
+      width="516"
+      height="558"
+      style="outline: currentcolor"
+    ></canvas>
+    <script type="module">
+      import init, { start } from "./pkg/plotter_rs.js";
+      async function run() {
+        await init();
+        await start("the_canvas_id");
+      }
+      run();
+    </script>
+  </body>
+</html>
