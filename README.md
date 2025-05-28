@@ -10,6 +10,7 @@ A lightweight mathematical function plotter built with Rust using the [eframe/eg
 - Interactive graph manipulation (drag to pan, scroll to zoom)
 - Dynamic axis scaling with automatically adjusting labels
 - Support for various mathematical expressions
+- Live demo available on [GitHub Pages](https://mteit.github.io/plotter-rs/)
 
 ## Building from Source
 
