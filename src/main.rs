@@ -6,7 +6,7 @@ fn main() -> eframe::Result {
   let native_options = eframe::NativeOptions {
     viewport: egui::ViewportBuilder::default()
       .with_title("PLOTTER")
-      .with_inner_size([516.0, 558.0])
+      .with_inner_size([916.0, 537.0])
       .with_fullscreen(false)
       .with_maximized(false)
       .with_resizable(false),
