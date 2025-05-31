@@ -188,11 +188,13 @@ fn draw_axes(
     );
 
     let format_mark_value = |value: f32| -> String {
-      match value.abs() {
-        x if x == value.abs().trunc() => format!("{:.0}", value),
-        ..0.01 => format!("{:.4}", value),
-        ..100.0 => format!("{:.1}", value),
-        _ => format!("{:.0}", value),
+      let formatted = format!("{:.2}", value);
+      if formatted.ends_with("00") {
+        formatted.trim_end_matches(".00").to_string()
+      } else if formatted.ends_with('0') {
+        formatted.trim_end_matches('0').to_string()
+      } else {
+        formatted
       }
     };
     let axis_offset = -10.0; // because marks start from (0;0)
@@ -203,25 +205,32 @@ fn draw_axes(
       -(axis_offset - (offset.y / PIXELS_PER_MARK).trunc() + i as f32) * scale_factor,
     );
     let font_id = egui::FontId::new(10.0, egui::FontFamily::Proportional);
+    // Handle x-axis labels (rotated by 90 degrees)
     let text_indent = 10.0;
     if x_value != "0" {
-      let text_rect = painter
-        .layout_no_wrap(x_value.clone(), font_id.clone(), egui::Color32::GRAY)
-        .rect;
-      let text_bottom_edge = x_axis[0].y + text_indent + text_rect.height();
-      let (pos, align) = if text_bottom_edge < canvas.max.y {
-        (
-          egui::Pos2::new(x, x_axis[0].y + text_indent),
-          egui::Align2::CENTER_TOP,
-        )
+      let galley = painter.layout_no_wrap(x_value.clone(), font_id.clone(), egui::Color32::GRAY);
+      let text_bottom_edge = x_axis[0].y + text_indent + galley.rect.width();
+      let pos = if text_bottom_edge < canvas.max.y {
+        egui::Pos2::new(x + (galley.rect.height() / 2.0), x_axis[0].y + text_indent)
       } else {
-        (
-          egui::Pos2::new(x, x_axis[0].y - text_indent),
-          egui::Align2::CENTER_BOTTOM,
+        egui::Pos2::new(
+          x + (galley.rect.height() / 2.0),
+          x_axis[0].y - galley.rect.width() - text_indent,
         )
       };
-      painter.text(pos, align, x_value, font_id.clone(), egui::Color32::GRAY);
+      let text_shape = egui::epaint::TextShape {
+        pos,
+        galley,
+        underline: egui::Stroke::NONE,
+        fallback_color: egui::Color32::GRAY,
+        override_text_color: None,
+        opacity_factor: 1.0,
+        angle: std::f32::consts::PI / 2.0, // 90 degrees rotation
+      };
+      painter.add(egui::Shape::Text(text_shape));
     }
+    // Handle y-axis labels
+    let text_indent = 10.0;
     if y_value != "-0" {
       let text_rect = painter
         .layout_no_wrap(y_value.clone(), font_id.clone(), egui::Color32::GRAY)
