@@ -1,13 +1,13 @@
 # Plotter-rs
 
-<p align="center"><img src="assets/plotter-demo.gif" width="550"/></p>
+<p align="center"><img src="assets/plotter-ui.png" width="550"/></p>
 
 A lightweight mathematical function plotter built with Rust using the [eframe/egui](https://github.com/emilk/egui) framework and custom [math-parser](https://github.com/mteit/math-parser) for expression evaluation.
 
 ## Features
 
-- Plot mathematical functions in real-time
-- Interactive graph manipulation (drag to pan, scroll to zoom)
+- Plot multiple mathematical functions in real-time
+- Customize each function with different colors and resolution
 - Dynamic axis scaling with automatically adjusting labels
 - Support for various mathematical expressions
 - Live demo available on [GitHub Pages](https://mteit.github.io/plotter-rs/)
@@ -16,7 +16,7 @@ A lightweight mathematical function plotter built with Rust using the [eframe/eg
 
 1) Clone the repository:
 ```bash
-git clone https://github.com/your-username/plotter-rs.git
+git clone https://github.com/mteit/plotter-rs.git
 cd plotter-rs
 ```
 
@@ -29,7 +29,7 @@ cargo run --release
 
 1) Clone the repository:
 ```bash
-git clone https://github.com/your-username/plotter-rs.git
+git clone https://github.com/mteit/plotter-rs.git
 cd plotter-rs
 ```
 
