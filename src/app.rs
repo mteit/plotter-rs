@@ -113,14 +113,22 @@ impl eframe::App for PlotterApp {
           egui::ScrollArea::vertical().show(ui, |ui| {
             for function in &mut self.function_list {
               ui.horizontal(|ui| {
-                ui.color_edit_button_srgba(&mut function.color);
-                ui.label("Points:");
-                let function_resolution = egui::DragValue::new(&mut function.resolution)
-                  .range(10..=10000)
-                  .speed(1);
-                ui.add(function_resolution);
-                let formula_imput =
-                  egui::TextEdit::singleline(&mut function.formula).hint_text("Enter a formula");
+                if !function.formula.is_empty() {
+                  ui.color_edit_button_srgba(&mut function.color);
+                  ui.label("Points:");
+                  let function_resolution = egui::DragValue::new(&mut function.resolution)
+                    .range(10..=9999)
+                    .speed(1);
+                  ui.add(function_resolution);
+                }
+                let formula_imput = egui::TextEdit::singleline(&mut function.formula)
+                  .text_color(match function.expression {
+                    Ok(_) => egui::Color32::BLACK,
+                    Err(_) => egui::Color32::RED,
+                  })
+                  .hint_text("Enter a formula")
+                  .char_limit(100)
+                  .desired_width(f32::INFINITY);
                 if ui.add(formula_imput).changed() {
                   function.expression = MathExpression::new(function.formula.as_str());
                 }

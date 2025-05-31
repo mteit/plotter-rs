@@ -1,4 +1,5 @@
 #![cfg(not(target_arch = "wasm32"))]
+#![cfg_attr(target_os = "windows", windows_subsystem = "windows")]
 
 mod app;
 
